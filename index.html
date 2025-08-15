@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Personal</title>
+    <style>
+        /* ... (Estilos anteriores sin cambios) ... */
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;background-color:#f0f2f5;display:flex;justify-content:center;align-items:center;height:100vh}.chat-container{width:100%;max-width:600px;height:80vh;background-color:#fff;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.1);display:flex;flex-direction:column;overflow:hidden}.chat-header{background-color:#4CAF50;color:#fff;padding:15px;font-size:1.2em;font-weight:700;text-align:center}.chat-messages{flex-grow:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column}.message{max-width:75%;padding:10px 15px;border-radius:18px;margin-bottom:10px;line-height:1.4;position:relative}.message.user{background-color:#0084ff;color:#fff;align-self:flex-end}.message.bot{background-color:#e4e6eb;color:#050505;align-self:flex-start}.chat-input-form{display:flex;padding:10px;border-top:1px solid #ddd}.chat-input-form input{flex-grow:1;border:1px solid #ccc;border-radius:18px;padding:10px 15px;font-size:1em;outline:0}.chat-input-form button{background-color:#4CAF50;color:#fff;border:0;padding:0 15px;margin-left:10px;border-radius:18px;cursor:pointer;font-size:1em;font-weight:700}.chat-input-form button:hover{background-color:#45a049}
+        /* --- NUEVOS ESTILOS PARA EL FEEDBACK --- */
+        .feedback-buttons {
+            display: none; /* Ocultos por defecto */
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            padding: 2px;
+        }
+        .message.bot:hover .feedback-buttons {
+            display: flex; /* Se muestran al pasar el ratón */
+        }
+        .feedback-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 5px;
+        }
+        .correction-panel {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">Asistente IA (Modo Entrenamiento)</div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot">¡Hola! Envíame un comando. Pasa el ratón sobre mi respuesta para calificarla.</div>
+        </div>
+        <form class="chat-input-form" id="chat-form">
+            <input type="text" id="user-input" placeholder="Escribe tu mensaje..." autocomplete="off">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const messagesContainer = document.getElementById('chat-messages');
+        let lastUserMessage = ''; // Guardaremos el último mensaje del usuario
+
+        chatForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const messageText = userInput.value.trim();
+            if (messageText === '') return;
+
+            lastUserMessage = messageText; // Guardamos el mensaje
+            addMessage(messageText, 'user');
+            userInput.value = '';
+            sendMessageToBot(messageText);
+        });
+
+        function addMessage(text, type, prediction = null) {
+            const messageId = 'msg-' + Date.now(); // ID único para cada mensaje
+            const messageWrapper = document.createElement('div');
+            messageWrapper.classList.add('message', type);
+            messageWrapper.id = messageId;
+            messageWrapper.innerText = text;
+
+            if (type === 'bot') {
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.classList.add('feedback-buttons');
+                feedbackDiv.innerHTML = `
+                    <button class="feedback-btn" data-verdict="correct" data-prediction="${prediction}" data-message-id="${messageId}">✓</button>
+                    <button class="feedback-btn" data-verdict="incorrect" data-prediction="${prediction}" data-message-id="${messageId}">✗</button>
+                `;
+                messageWrapper.appendChild(feedbackDiv);
+            }
+            messagesContainer.appendChild(messageWrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessageToBot(text) {
+            const formData = new URLSearchParams();
+            formData.append('driver', 'web');
+            formData.append('userId', '12345');
+            formData.append('message', text);
+
+            try {
+                const response = await fetch('chatbot.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        // Pasamos la predicción del bot a la función addMessage
+                        addMessage(msg.text, 'bot', msg.additionalParameters.intencion);
+                    });
+                }
+            } catch (error) {
+                addMessage("Lo siento, hubo un error de conexión.", 'bot');
+            }
+        }
+        
+        // --- NUEVA LÓGICA PARA MANEJAR CLICS EN BOTONES DE FEEDBACK ---
+        messagesContainer.addEventListener('click', function(event) {
+            const target = event.target;
+            if (!target.classList.contains('feedback-btn')) return;
+
+            const verdict = target.dataset.verdict;
+            const prediction = target.dataset.prediction;
+            const messageId = target.dataset.messageId;
+
+            if (verdict === 'correct') {
+                sendFeedbackToServer(lastUserMessage, prediction, true, null);
+                target.parentElement.innerHTML = '<span>¡Gracias!</span>'; // Desactiva los botones
+            } else if (verdict === 'incorrect') {
+                showCorrectionPanel(messageId, prediction);
+            }
+        });
+
+        function showCorrectionPanel(messageId, prediction) {
+            const messageElement = document.getElementById(messageId);
+            const panel = document.createElement('div');
+            panel.classList.add('correction-panel');
+            panel.innerHTML = `
+                <p style="margin:0 0 5px 0; font-size:12px;"><b>Predicción incorrecta.</b> ¿Cuál era la intención correcta?</p>
+                <select id="correction-select-${messageId}" style="width:100%; padding:5px;">
+                    <option value="añadir_tarea">Añadir Tarea</option>
+                    <option value="listar_tareas">Listar Tareas</option>
+                    <option value="completar_tarea">Completar Tarea</option>
+                    <option value="eliminar_tarea">Eliminar Tarea</option>
+                    <option value="saludar">Saludar</option>
+                    <option value="charla_general">Charla General</option>
+                </select>
+                <button id="confirm-correction-${messageId}" style="width:100%; margin-top:5px;">Confirmar</button>
+            `;
+            messageElement.appendChild(panel);
+            // Desactivamos los botones de feedback originales
+            messageElement.querySelector('.feedback-buttons').style.display = 'none';
+
+            document.getElementById(`confirm-correction-${messageId}`).addEventListener('click', function() {
+                const selectedIntention = document.getElementById(`correction-select-${messageId}`).value;
+                sendFeedbackToServer(lastUserMessage, prediction, false, selectedIntention);
+                messageElement.removeChild(panel);
+                messageElement.querySelector('.feedback-buttons').innerHTML = '<span>¡Corregido!</span>';
+                messageElement.querySelector('.feedback-buttons').style.display = 'flex';
+            });
+        }
+
+        async function sendFeedbackToServer(userText, prediction, isCorrect, correctIntention) {
+             try {
+                await fetch('guardar_feedback.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        texto_usuario: userText,
+                        prediccion_modelo: prediction,
+                        es_correcto: isCorrect,
+                        intencion_correcta: correctIntention
+                    })
+                });
+            } catch (error) {
+                console.error("Error al enviar feedback:", error);
+            }
+        }
+    </script>
+</body>
+</html>

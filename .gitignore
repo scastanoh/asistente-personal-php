@@ -1,0 +1,9 @@
+# Directorio de librerías de Composer. Se reinstala con "composer install".
+/vendor/
+
+# El modelo de IA entrenado. Es un archivo binario grande.
+# Es mejor guardar los datos (training_data.csv) y el script que lo crea.
+/modelo_entrenado.phpml
+
+# Archivos de configuración local o sensibles (ejemplo)
+# .env
