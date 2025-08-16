@@ -7,3 +7,26 @@
 
 # Archivos de configuración local o sensibles (ejemplo)
 # .env
+# Entorno virtual de Python
+/venv/
+
+# Caché de Python
+__pycache__/
+*.pyc
+
+# Carpetas de modelos de IA (se generan al entrenar)
+/ner_model/
+/ner_model_full/
+/ner_expert_model/
+
+# Entorno virtual de Python
+/venv/
+
+# Caché de Python
+__pycache__/
+*.pyc
+
+# Carpetas de modelos de IA (se generan al entrenar)
+/ner_model/
+/ner_model_full/
+/ner_expert_model/
