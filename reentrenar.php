@@ -22,22 +22,26 @@ echo "Se encontraron " . count($nuevos_datos) . " nuevos registros de feedback.\
 
 // 2. Formatear y añadir los nuevos datos a training_data.csv
 echo "Paso 2: Añadiendo nuevos datos a training_data.csv...\n";
-$csv_file = fopen('training_data.csv', 'a'); // 'a' para añadir al final
+$csv_file = fopen('training_data.csv', 'a');
+
+$clasesValidas = ['saludar','charla_general','listar_tareas','añadir_tarea','completar_tarea','eliminar_tarea'];
 $count_added = 0;
+
 foreach ($nuevos_datos as $dato) {
-    $texto = $dato['texto_usuario'];
-    // Si el usuario marcó como incorrecto, usamos la intención que corrigió.
-    $intencion = $dato['es_correcto'] ? $dato['prediccion_modelo'] : $dato['intencion_correcta'];
-    
-    if (!empty($intencion)) {
-         // Formato CSV: "texto",intencion
-        fputcsv($csv_file, [$texto, $intencion]);
-        $count_added++;
+    $texto = trim((string)$dato['texto_usuario']);
+    $candidata = $dato['es_correcto'] ? $dato['prediccion_modelo'] : $dato['intencion_correcta'];
+    $intencion = strtolower(trim((string)$candidata));
+
+    if ($texto === '' || $intencion === '' || $intencion === 'null' || !in_array($intencion, $clasesValidas, true)) {
+        continue;
     }
+
+    fputcsv($csv_file, [$texto, $intencion]);
+    $count_added++;
 }
 fclose($csv_file);
-echo "Se añadieron " . $count_added . " ejemplos de alta calidad al archivo de entrenamiento.\n";
 
+echo "Se añadieron $count_added ejemplos válidos al archivo de entrenamiento.\n";
 // 3. Ejecutar la lógica de entrenamiento del modelo (copiada de entrenar_modelo.php)
 echo "Paso 3: Re-entrenando el modelo de IA...\n";
 require_once 'vendor/autoload.php';

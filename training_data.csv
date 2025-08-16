@@ -174,7 +174,7 @@
 "dime mis pendentes",listar_tareas
 "revisar tareas porfabor",listar_tareas
 "mis tareas??",listar_tareas
-"pendientes",listar_tareas
+pendientes,listar_tareas
 "la lista",listar_tareas
 "mis recordatorios",listar_tareas
 "y ahora que",listar_tareas
@@ -207,9 +207,9 @@
 "los pendientes cuales son",listar_tareas
 "dame un resumen d mis tareas",listar_tareas
 "que toca ahora",listar_tareas
-"mistareas",listar_tareas
-"listadetareas",listar_tareas
-"quétengoquehacer",listar_tareas
+mistareas,listar_tareas
+listadetareas,listar_tareas
+quétengoquehacer,listar_tareas
 "hay algo mas?",listar_tareas
 "y q mas",listar_tareas
 "a ver, qué toca hacer hoy",listar_tareas
@@ -309,7 +309,7 @@
 "repasa mis tareas",listar_tareas
 "recuérdame qué tenía que hacer",listar_tareas
 "mis tareas",listar_tareas
-"pendientes",listar_tareas
+pendientes,listar_tareas
 "lista de quehaceres",listar_tareas
 "muéstrame la agenda",listar_tareas
 "qué tengo programado",listar_tareas
@@ -318,7 +318,7 @@
 "qué hay anotado",listar_tareas
 "a ver, qué hay que hacer",listar_tareas
 "repasa la lista",listar_tareas
-" dime los recordatorios",listar_tareas
+"dime los recordatorios",listar_tareas
 "qué tareas tengo",listar_tareas
 "cómo va mi lista de tareas",listar_tareas
 "ya terminé la tarea 1",completar_tarea
@@ -617,14 +617,14 @@
 "la 2, a la papelera.",eliminar_tarea
 "tira a la basura la tarea 2",eliminar_tarea
 "olvida la tarea número 3",eliminar_tarea
-"hola",saludar
-"hola",saludar
+hola,saludar
+hola,saludar
 "buenos días",saludar
 "buenas tardes",saludar
-"hla",saludar
-"ola",saludar
+hla,saludar
+ola,saludar
 "buens dias",saludar
-"wenas",saludar
+wenas,saludar
 "q tal",saludar
 "como estas",saludar
 "k tal",saludar
@@ -635,48 +635,48 @@
 "bn dia",saludar
 "bnas tardes",saludar
 "bnas noches",saludar
-"holi",saludar
-"holis",saludar
-"wenasss",saludar
+holi,saludar
+holis,saludar
+wenasss,saludar
 "q se cuenta",saludar
 "todo bn?",saludar
 "q fue",saludar
-"salu2",saludar
+salu2,saludar
 "q pex",saludar
-"wena",saludar
-"saluditos",saludar
+wena,saludar
+saluditos,saludar
 "y tu q tal",saludar
 "q es lo q hay",saludar
-"hey!",saludar
-"yoo",saludar
-"epale",saludar
-"kiubo",saludar
+hey!,saludar
+yoo,saludar
+epale,saludar
+kiubo,saludar
 "q rollo",saludar
-"hello",saludar
-"hi",saludar
-"heyyy",saludar
-"ey",saludar
-"opaa",saludar
-"holaaa",saludar
-"holaaaa",saludar
+hello,saludar
+hi,saludar
+heyyy,saludar
+ey,saludar
+opaa,saludar
+holaaa,saludar
+holaaaa,saludar
 "qe tal",saludar
-"buenas.",saludar
+buenas.,saludar
 "q tal todo",saludar
 "q me cuentas",saludar
 "hola q hace",saludar
 "como andas",saludar
-"holuu",saludar
+holuu,saludar
 "hey q tal",saludar
 "hola como estas",saludar
 "buenas noches.",saludar
 "buenas tardes.",saludar
-"saludos.",saludar
+saludos.,saludar
 "un saludo.",saludar
 "que hay de nuevo",saludar
 "que tal va todo",saludar
 "buenas noches",saludar
-"buenas",saludar
-"hey",saludar
+buenas,saludar
+hey,saludar
 "qué tal",saludar
 "cómo estás",saludar
 "cómo te va",saludar
@@ -686,18 +686,18 @@
 "cómo andas",saludar
 "qué tal todo",saludar
 "todo bien",saludar
-"quiubo",saludar
-"epa",saludar
+quiubo,saludar
+epa,saludar
 "qué se cuenta",saludar
 "cómo vamos",saludar
 "qué es de tu vida",saludar
 "cuánto tiempo",saludar
 "qué gusto verte",saludar
 "me alegro de verte",saludar
-"aló",saludar
+aló,saludar
 "muy buenas",saludar
-"holi",saludar
-"holitas",saludar
+holi,saludar
+holitas,saludar
 "hola, hola",saludar
 "buenas, buenas",saludar
 "qué hay de nuevo",saludar
@@ -706,11 +706,11 @@
 "todo en orden",saludar
 "pura vida",saludar
 "qué más",saludar
-"habla",saludar
+habla,saludar
 "qué fue",saludar
-"dime",saludar
-"bendiciones",saludar
-"saludos",saludar
+dime,saludar
+bendiciones,saludar
+saludos,saludar
 "un saludo",saludar
 "hola, qué hace",saludar
 "qué onda, güey",saludar
@@ -718,7 +718,7 @@
 "cómo va la cosa",saludar
 "qué se dice la gente",saludar
 "qué hubo",saludar
-"wena",saludar
+wena,saludar
 "wen día",saludar
 "wena tarde",saludar
 "wena noche",saludar
@@ -727,7 +727,7 @@
 "epa, colega",saludar
 "qué tal, amigo",saludar
 "hola, mi gente",saludar
-"saluditos",saludar
+saluditos,saludar
 "cómo estás tú",saludar
 "y tú, qué tal",saludar
 "qué es lo que hay",saludar
@@ -738,7 +738,7 @@
 "qué te trae por aquí",saludar
 "qué tiempo hace hoy",charla_general
 "cuéntame un chiste",charla_general
-"gracias",charla_general
+gracias,charla_general
 "de nada",charla_general
 "quién eres",charla_general
 "me gusta tu trabajo",charla_general
@@ -772,17 +772,17 @@
 "quien eres tu",charla_general
 "como te yamas",charla_general
 "eres un bot",charla_general
-"mano",saludar
+mano,saludar
 "mi pana",saludar
-"parce",saludar
-"causa",saludar
-"tío",saludar
-"máquina",saludar
-"fiera",saludar
-"jefe",saludar
-"maestro",saludar
-"patrón",saludar
-"campeón",saludar
+parce,saludar
+causa,saludar
+tío,saludar
+máquina,saludar
+fiera,saludar
+jefe,saludar
+maestro,saludar
+patrón,saludar
+campeón,saludar
 "hola, corazón",saludar
 "hola, guapo",saludar
 "hola, guapa",saludar
@@ -796,16 +796,16 @@
 "alguna novedad",saludar
 "todo tranquilo",saludar
 "todo correcto",saludar
-"yepa",saludar
-"opá",saludar
-"sha",saludar
+yepa,saludar
+opá,saludar
+sha,saludar
 "hola, caracola",saludar
 "qué más pues",saludar
 "buenas y santas",saludar
 "cómo amaneces",saludar
 "qué tal va la jornada",saludar
 "hola, qué se sabe",saludar
-"yeee",saludar
+yeee,saludar
 "qué se dice, fiera",saludar
 "un placer saludarte",saludar
 "feliz mañana",saludar
@@ -822,7 +822,7 @@
 "buenas, qué tal todo",saludar
 "hola a todos",saludar
 "qué tal, gente",saludar
-"eoooo",saludar
+eoooo,saludar
 "hola, mundo",saludar
 "qué tal la familia",saludar
 "hola, qué hay de tu vida",saludar
@@ -831,7 +831,7 @@
 "cómo amaneces",saludar
 "qué tal va la jornada",saludar
 "hola, qué se sabe",saludar
-"yeee",saludar
+yeee,saludar
 "qué se dice, fiera",saludar
 "un placer saludarte",saludar
 "feliz mañana",saludar
@@ -847,17 +847,17 @@
 "cómo estamos",saludar
 "buenas, qué tal todo",saludar
 "buenos días",saludar
-"hey",saludar
-"Holisss",saludar
-"Holaaa",saludar
-"Holas",saludar
+hey,saludar
+Holisss,saludar
+Holaaa,saludar
+Holas,saludar
 "Que se dice",saludar
 "Que te cuentas",saludar
-"Hola",saludar
+Hola,saludar
 "Buenos días",saludar
 "Buenas tardes",saludar
 "Buenas noches",saludar
-"Buenas",saludar
+Buenas,saludar
 "Qué tal",saludar
 "Cómo estás",saludar
 "Cómo te va",saludar
@@ -867,19 +867,19 @@
 "Cómo andas",saludar
 "Qué tal todo",saludar
 "Todo bien",saludar
-"Quiubo",saludar
-"Hey",saludar
-"Epa",saludar
+Quiubo,saludar
+Hey,saludar
+Epa,saludar
 "Qué se cuenta",saludar
 "Cómo vamos",saludar
 "Qué es de tu vida",saludar
 "Cuánto tiempo",saludar
 "Qué gusto verte",saludar
 "Me alegro de verte",saludar
-"Aló",saludar
+Aló,saludar
 "Muy buenas",saludar
-"Holi",saludar
-"Holitas",saludar
+Holi,saludar
+Holitas,saludar
 "Hola, hola",saludar
 "Buenas, buenas",saludar
 "Qué hay de nuevo",saludar
@@ -888,11 +888,11 @@
 "Todo en orden",saludar
 "Pura vida",saludar
 "Qué más",saludar
-"Habla",saludar
+Habla,saludar
 "Qué fue",saludar
-"Dime",saludar
-"Bendiciones",saludar
-"Saludos",saludar
+Dime,saludar
+Bendiciones,saludar
+Saludos,saludar
 "Un saludo",saludar
 "Hola, qué hace",saludar
 "Qué onda, güey",saludar
@@ -900,7 +900,7 @@
 "Cómo va la cosa",saludar
 "Qué se dice la gente",saludar
 "Qué hubo",saludar
-"Wena",saludar
+Wena,saludar
 "Wen día",saludar
 "Wena tarde",saludar
 "Wena noche",saludar
@@ -909,7 +909,7 @@
 "Epa, colega",saludar
 "Qué tal, amigo",saludar
 "Hola, mi gente",saludar
-"Saluditos",saludar
+Saluditos,saludar
 "Cómo estás tú",saludar
 "Y tú, qué tal",saludar
 "Qué es lo que hay",saludar
@@ -918,17 +918,17 @@
 "Dichosos los ojos",saludar
 "A los años",saludar
 "Qué te trae por aquí",saludar
-"Mano",saludar
+Mano,saludar
 "Mi pana",saludar
-"Parce",saludar
-"Causa",saludar
-"Tío",saludar
-"Máquina",saludar
-"Fiera",saludar
-"Jefe",saludar
-"Maestro",saludar
-"Patrón",saludar
-"Campeón",saludar
+Parce,saludar
+Causa,saludar
+Tío,saludar
+Máquina,saludar
+Fiera,saludar
+Jefe,saludar
+Maestro,saludar
+Patrón,saludar
+Campeón,saludar
 "Hola, corazón",saludar
 "Hola, guapo",saludar
 "Hola, guapa",saludar
@@ -942,33 +942,57 @@
 "Alguna novedad",saludar
 "Todo tranquilo",saludar
 "Todo correcto",saludar
-"Yepa",saludar
-"Opá",saludar
-"Sha",saludar
-"Hola, caracola",saludar"Cuentame un chiste",charla_general
+Yepa,saludar
+Opá,saludar
+Sha,saludar
 "Cuentame algo",charla_general
-holi,null
-holiss,null
-"COmo vas?",null
-"Muestrame mis tareas",null
-holisss,null
-"BIen bien, gracias",null
-"Si, muestrame mis tareas",null
-"ELimina la 13",null
-"Muestrame mis pendientes",null
-jajaja,null
-jajaja,null
 "Elimina todo",eliminar_tarea
-"Elimina de la 1 a la 5",null
 "MUestrame lo que debo hacer",listar_tareas
 "Que haces?",charla_general
-"Qué mas?",null
 "Elimna la 1",eliminar_tarea
 "Completa la 7",completar_tarea
 hola?,saludar
 holaaaaaaaaaaaaaaaaaaaaa,saludar
 holaaaaaaa,saludar
 "que haces?",charla_general
-hola,null
-"cuentame algo",null
 "Elimimname la 10",eliminar_tarea
+"Como vassss?",charla_general
+"Muestrame mis tareas",listar_tareas
+tareas,listar_tareas
+"mis tareas",listar_tareas
+"Elimina la 13",eliminar_tarea
+"Muestrame mis pendientes",listar_tareas
+"Muestrame mis pendientes",listar_tareas
+"Muestrame mis pendientes",listar_tareas
+"Muestrame mis pendientes",listar_tareas
+"Muestrame mis tareas", 
+"Muestrame mis tareas",listar_tareas
+Hola,saludar
+Hola,saludar
+Hola,saludar
+hola,saludar
+"Agrega 1, la cual quiero que hacer un 
+"Añade 'revisar el informe' para el viernes",añadir_tarea
+"recuérdame llamar al dentista mañana por la mañana",añadir_tarea
+"tengo que entregar el proyecto el 25 de diciembre",añadir_tarea
+"Anota que la reunión es el lunes a las 10am",añadir_tarea
+"nueva tarea: comprar billetes de tren para la próxima semana",añadir_tarea
+"apunta ir al supermercado esta tarde",añadir_tarea
+"crea una tarea urgente para llamar al cliente",añadir_tarea"MUESTRA MIS TAREAS",listar_tareas
+"MUESTRA MIS TAREAS",listar_tareas
+"Muestra mis tareas",añadir_tarea
+"Muestra mis tareas",listar_tareas
+"Mis tareas",listar_tareas
+hOLAAA,saludar
+hOLAAA,saludar
+HOLA,saludar
+hoLa,saludar
+hOLA,saludar
+hola,saludar
+"completa la tarea 1",completar_tarea
+"termina la tarea numero 2",completar_tarea
+"marca como hecha la 3",completar_tarea
+"ya terminé el punto 1",completar_tarea
+"borra la tarea 2",eliminar_tarea
+"elimina el pendiente 1",eliminar_tarea
+"quita la tarea numero 3",eliminar_tarea

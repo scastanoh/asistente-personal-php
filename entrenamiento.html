@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gimnasio de IA - Entrenamiento Preciso</title>
+    <style>/* ... los mismos estilos de antes ... */ body{font-family:sans-serif;background-color:#f4f4f4;padding:20px}.container{max-width:800px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1)}h1,h2{text-align:center;color:#333}.form-group{margin-bottom:15px}label{display:block;margin-bottom:5px;font-weight:700}input[type=text],input[type=date],input[type=time]{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box}button{width:100%;padding:10px 15px;background-color:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:1.1em}button:hover{background-color:#218838}#status-message{text-align:center;font-weight:700;margin-top:15px}</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gimnasio de IA</h1>
+        <h2>Crear Datos de Entrenamiento Precisos</h2>
+        <form id="training-form">
+            <div class="form-group">
+                <label for="texto-original">Frase del Usuario:</label>
+                <input type="text" id="texto-original" placeholder="Ej: recuérdame la cena con Ana el próximo viernes a las 9pm" required>
+            </div>
+            <hr>
+            <h3>Entidades Correctas (Las "Respuestas" para la IA)</h3>
+            <div class="form-group">
+                <label for="tarea-correcta">TAREA (Texto Exacto):</label>
+                <input type="text" id="tarea-correcta" placeholder="Copia y pega la descripción de la tarea aquí">
+            </div>
+            <div class="form-group">
+                <label for="fecha-texto">FECHA (Texto Exacto):</label>
+                <input type="text" id="fecha-texto" placeholder="Copia y pega la fecha aquí (ej: 'mañana', 'el próximo viernes')">
+            </div>
+            <div class="form-group">
+                <label for="hora-texto">HORA (Texto Exacto):</label>
+                <input type="text" id="hora-texto" placeholder="Copia y pega la hora aquí (ej: 'a las 10am', 'a las 21:00')">
+            </div>
+            <button type="submit">Guardar Ejemplo Perfecto</button>
+        </form>
+        <div id="status-message"></div>
+    </div>
+    <script>
+        document.getElementById('training-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const statusMessage = document.getElementById('status-message');
+            const data = {
+                texto_original: document.getElementById('texto-original').value,
+                tarea_correcta: document.getElementById('tarea-correcta').value,
+                fecha_texto: document.getElementById('fecha-texto').value,
+                hora_texto: document.getElementById('hora-texto').value
+            };
+            try {
+                const response = await fetch('guardar_entrenamiento.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    statusMessage.textContent = '¡Ejemplo guardado con éxito!';
+                    statusMessage.style.color = 'green';
+                    this.reset();
+                } else { throw new Error(result.message); }
+            } catch (error) {
+                statusMessage.textContent = 'Error: ' + error.message;
+                statusMessage.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

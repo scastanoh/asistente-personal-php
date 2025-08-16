@@ -4,26 +4,30 @@ require_once 'vendor/autoload.php';
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
-use Gemini;
+use Carbon\Carbon;
 
-$apiKey = 'AIzaSyCHvxajY158PgFehLD5F6O0k-_ht9wYdk0'; // Tu clave
+// --- CONFIGURACIÓN GLOBAL ---
+date_default_timezone_set('America/Bogota');
+Carbon::setLocale('es');
 
-$db_host = 'localhost';
-$db_name = 'asistente_ia_db';
-$db_user = 'asistente_user';
-$db_pass = 'Sanjose4$';
+// --- CONEXIÓN A LA BASE DE DATOS ---
+$pdo = new PDO("mysql:host=localhost;dbname=asistente_ia_db;charset=utf8mb4", 'asistente_user', 'Sanjose4$');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-try {
-    $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Error de conexión a la BD: " . $e->getMessage());
-}
-
+// --- CARGA DEL MODELO DE IA PARA INTENCIONES ---
 $modelFile = 'modelo_entrenado.phpml';
+if (!file_exists($modelFile)) {
+    die("Error: El archivo del modelo 'modelo_entrenado.phpml' no existe. Por favor, ejecuta 'php entrenar_modelo.php'.");
+}
 $modelData = unserialize(file_get_contents($modelFile));
 $classifier = $modelData['classifier'];
 $vectorizer = $modelData['vectorizer'];
+if (!$classifier || !$vectorizer) {
+    die("Error: el modelo de intenciones no se cargó correctamente.");
+}
+
+
+// --- FUNCIONES GLOBALES DE AYUDA ---
 
 function predecirIntencion($texto) {
     global $classifier, $vectorizer;
@@ -32,70 +36,174 @@ function predecirIntencion($texto) {
     return $classifier->predict($samples)[0];
 }
 
-function extraerEntidadTarea($texto) {
-    $textoNormalizado = strtolower($texto);
-    $palabrasClave = ['añade', 'añadir', 'apunta', 'anota', 'recuérdame', 'crea una tarea', 'nueva tarea', 'agrega', 'agregame', 'pon', 'necesito', 'tengo que'];
-    foreach ($palabrasClave as $palabra) {
-        $pos = strpos($textoNormalizado, $palabra);
-        if ($pos !== false) {
-            $entidad = trim(substr($textoNormalizado, $pos + strlen($palabra)));
-            $relleno = ['que ', 'la tarea de ', 'la tarea ', 'un recordatorio para ', 'un pendiente: ', ': '];
-            foreach ($relleno as $r) {
-                if (substr($entidad, 0, strlen($r)) === $r) $entidad = substr($entidad, strlen($r));
+function _extraerEntidadesConIA($texto) {
+    $escaped_text = escapeshellarg($texto);
+    $python_path = __DIR__ . '/venv/bin/python3';
+    $script_path = __DIR__ . '/ner_extractor.py';
+    $command = $python_path . ' ' . $script_path . ' ' . $escaped_text;
+    $json_output = shell_exec($command);
+    $entidades_ia = json_decode($json_output, true);
+    $tarea = null;
+    $fecha = null;
+    $hora = null;
+    $fragmentos_tiempo_ia = [];
+    if (is_array($entidades_ia)) {
+        foreach ($entidades_ia as $entidad) {
+            if ($entidad['type'] === 'TAREA') {
+                $tarea = $entidad['text'];
             }
-            return trim($entidad);
+            if ($entidad['type'] === 'FECHA' || $entidad['type'] === 'HORA' || $entidad['type'] === 'TIEMPO' || $entidad['type'] === 'DATE' || $entidad['type'] === 'TIME') {
+                $fragmentos_tiempo_ia[] = $entidad['text'];
+            }
         }
     }
-    return $texto;
+    $texto_tiempo_completo = implode(' ', $fragmentos_tiempo_ia);
+    if (!empty($texto_tiempo_completo)) {
+        try {
+            $carbonDate = Carbon::parse($texto_tiempo_completo);
+            $fecha = $carbonDate->toDateString();
+            if ($carbonDate->hour != 0 || $carbonDate->minute != 0) {
+                $hora = $carbonDate->toTimeString('minutes');
+            }
+        } catch (\Exception $e) {
+        }
+    }
+    if ($tarea === null) {
+        $tarea = $texto;
+        $palabrasClave = ['anótalo por favor', 'recuérdame que', 'recuérdame', 'apunta que', 'apunta', 'anota que', 'anota', 'añade que', 'añade', 'crea una tarea para', 'tengo que', 'debo'];
+        if (!empty($fragmentos_tiempo_ia)) {
+            foreach ($fragmentos_tiempo_ia as $fragmento) {
+                $tarea = trim(str_ireplace($fragmento, '', $tarea));
+            }
+        }
+        foreach ($palabrasClave as $palabra) {
+            $tarea = trim(str_ireplace($palabra, '', $tarea));
+        }
+    }
+    return ['tarea_predicha' => ucfirst(trim($tarea)), 'fecha_predicha' => $fecha, 'hora_predicha' => $hora];
 }
 
-// --- FUNCIÓN DE CONEXIÓN CON GEMINI (VERSIÓN FINAL) ---
-function obtenerRespuestaGemini($pregunta) {
-    global $apiKey;
-    if ($apiKey === 'TU_API_KEY_DE_GEMINI_AQUI' || empty($apiKey)) {
-        return "Error de configuración: La clave de la API de Gemini no ha sido establecida.";
-    }
-    try {
-        $client = Gemini::client($apiKey);
-        // ¡LÍNEA CORREGIDA! Usamos el nombre del modelo más reciente y recomendado.
-        $result = $client->generativeModel('gemini-1.5-flash-latest')->generateContent($pregunta);
-        return $result->text();
-    } catch (\Exception $e) {
-        error_log("Error de la API de Gemini: " . $e->getMessage());
-        return "Lo siento, hubo un problema con la conexión a la IA de Gemini. Revisa el log de Apache.";
-    }
-}
-
+// --- LÓGICA PRINCIPAL DEL BOT ---
 $config = [];
 DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
 $botman = BotManFactory::create($config);
 
 $botman->fallback(function (BotMan $bot) use ($pdo) {
     $textoUsuario = $bot->getMessage()->getText();
-    $intencion = predecirIntencion($textoUsuario);
+    $payload = $bot->getMessage()->getPayload();
     
+    // Verificamos si es un comando interno enviado por nuestro JavaScript
+    $esComandoInterno = isset($payload['is_internal']) && $payload['is_internal'];
+    
+    $intencion = $esComandoInterno ? $payload['internal_intent'] : predecirIntencion($textoUsuario);
+    $datos_adicionales = ['intencion' => $intencion];
+
     switch ($intencion) {
-        case 'charla_general':
-            $respuesta_gemini = obtenerRespuestaGemini($textoUsuario);
-            $bot->reply($respuesta_gemini);
-            break;
-        case 'saludar':
-            $bot->reply('¡Hola! ¿Cómo puedo ayudarte?');
-            break;
-        case 'listar_tareas':
-            $stmt = $pdo->query("SELECT id, descripcion FROM tareas WHERE completada = FALSE ORDER BY fecha_creacion ASC");
-            $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if(count($tareas)>0){$respuesta="Estas son tus tareas pendientes:\n";foreach($tareas as $index=>$tarea){$respuesta .=($index+1).". ".$tarea['descripcion']."\n";}}else{$respuesta="¡Felicidades! No tienes ninguna tarea pendiente.";}$bot->reply($respuesta);
-            break;
         case 'añadir_tarea':
-            $tareaLimpia = extraerEntidadTarea($textoUsuario);$stmt=$pdo->prepare("INSERT INTO tareas (descripcion) VALUES (?)");$stmt->execute([ucfirst($tareaLimpia)]);$bot->reply('¡Anotado! He añadido la tarea: "'.ucfirst($tareaLimpia).'"');
+            $entidades = _extraerEntidadesConIA($textoUsuario);
+            $tarea = $entidades['tarea_predicha'];
+            $fecha = $entidades['fecha_predicha'];
+            $hora = $entidades['hora_predicha'];
+            $fechaFormateada = "Sin fecha definida";
+            if ($fecha) {
+                $tiempoCompleto = trim($fecha . ' ' . $hora);
+                $fechaFormateada = Carbon::parse($tiempoCompleto)->isoFormat('dddd D [de] MMMM [a las] H:mm');
+            }
+            $respuesta = "He entendido lo siguiente:\n\n📝 **Tarea:** \"" . ucfirst($tarea) . "\"\n🗓️ **Fecha:** " . $fechaFormateada;
+            
+            // Adjuntamos los datos extraídos para que el frontend cree los botones
+            $datos_adicionales['extracted_data'] = [
+                'descripcion' => $tarea,
+                'fecha' => $fecha,
+                'hora' => $hora
+            ];
+            $bot->reply($respuesta, $datos_adicionales);
             break;
+
+        case 'guardar_tarea_corregida':
+            // Leemos los datos JSON que nos envía el frontend desde el payload
+            $datosGuardar = json_decode($payload['payload_data'], true);
+            $descripcion = $datosGuardar['descripcion'];
+            $fecha = null;
+            if ($datosGuardar['fecha'] && $datosGuardar['hora']) {
+                 $fecha = Carbon::createFromFormat('Y-m-d H:i', $datosGuardar['fecha'] . ' ' . $datosGuardar['hora'])->toDateTimeString();
+            } elseif ($datosGuardar['fecha']) {
+                 $fecha = Carbon::parse($datosGuardar['fecha'])->toDateTimeString();
+            }
+            
+            $sql = "INSERT INTO tareas (descripcion, fecha_vencimiento) VALUES (?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([ucfirst($descripcion), $fecha]);
+            
+            // Usamos una intención "final" para que el frontend no muestre más botones
+            $bot->reply('✅ ¡Entendido! He guardado la tarea.', ['intencion' => 'final']);
+            break;
+            
+        case 'listar_tareas':
+            $sql = "SELECT descripcion, fecha_vencimiento FROM tareas WHERE completada = FALSE ORDER BY CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END, fecha_vencimiento ASC, id ASC";
+            $stmt = $pdo->query($sql);
+            $tareas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (count($tareas) > 0) {
+                $respuesta = "Estas son tus tareas pendientes:\n";
+                foreach ($tareas as $index => $tarea) {
+                    $respuesta .= "\n" . ($index + 1) . ". " . $tarea['descripcion'];
+                    if ($tarea['fecha_vencimiento']) {
+                        $fechaVencimiento = Carbon::parse($tarea['fecha_vencimiento']);
+                        // ¡LÓGICA PROACTIVA!
+                        if ($fechaVencimiento->isPast()) {
+                            $respuesta .= " **(🚨 ¡Venció " . $fechaVencimiento->diffForHumans() . "!)**";
+                        } elseif ($fechaVencimiento->isToday()) {
+                            $respuesta .= " **(⚠️ Vence hoy)**";
+                        } else {
+                            $respuesta .= " (Vence: " . $fechaVencimiento->diffForHumans() . ")";
+                        }
+                    }
+                }
+            } else {
+                $respuesta = "¡Felicidades! No tienes ninguna tarea pendiente.";
+            }
+            $bot->reply($respuesta, $datos_adicionales);
+            break;
+
         case 'completar_tarea':
         case 'eliminar_tarea':
-            if(preg_match('/(\d+)/',$textoUsuario,$matches)){$numeroTarea=(int)$matches[1];$stmt=$pdo->query("SELECT id FROM tareas WHERE completada = FALSE ORDER BY fecha_creacion ASC");$ids=$stmt->fetchAll(PDO::FETCH_COLUMN);if(isset($ids[$numeroTarea-1])){$idReal=$ids[$numeroTarea-1];if($intencion==='completar_tarea'){$updateStmt=$pdo->prepare("UPDATE tareas SET completada = TRUE WHERE id = ?");$updateStmt->execute([$idReal]);$bot->reply('¡Excelente! He marcado la tarea '.$numeroTarea.' como completada.');}else{$deleteStmt=$pdo->prepare("DELETE FROM tareas WHERE id = ?");$deleteStmt->execute([$idReal]);$bot->reply('Hecho. He eliminado la tarea '.$numeroTarea.'.');}}else{$bot->reply('Lo siento, no encuentro la tarea número '.$numeroTarea.' en tu lista.');}}else{$bot->reply('Entendí la acción, pero necesito el número de la tarea.');}
+            // Buscamos un número en la frase del usuario (ej: "completa la 2")
+            if (preg_match('/(\d+)/', $textoUsuario, $matches)) {
+                $numeroTarea = (int)$matches[1];
+                
+                // Obtenemos la lista de tareas PENDIENTES en el orden en que se muestran
+                $stmt = $pdo->query("SELECT id FROM tareas WHERE completada = FALSE ORDER BY CASE WHEN fecha_vencimiento IS NULL THEN 1 ELSE 0 END, fecha_vencimiento ASC, id ASC");
+                $ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                // Verificamos si el número que dio el usuario existe en la lista
+                if (isset($ids[$numeroTarea - 1])) {
+                    $idReal = $ids[$numeroTarea - 1]; // Mapeamos el número de lista al ID real de la BD
+                    
+                    if ($intencion === 'completar_tarea') {
+                        $updateStmt = $pdo->prepare("UPDATE tareas SET completada = TRUE WHERE id = ?");
+                        $updateStmt->execute([$idReal]);
+                        $textoResp = '✅ ¡Excelente! He marcado la tarea ' . $numeroTarea . ' como completada.';
+                    } else { // eliminar_tarea
+                        $deleteStmt = $pdo->prepare("DELETE FROM tareas WHERE id = ?");
+                        $deleteStmt->execute([$idReal]);
+                        $textoResp = '🗑️ Hecho. He eliminado la tarea ' . $numeroTarea . '.';
+                    }
+                } else {
+                    $textoResp = 'Lo siento, no encuentro la tarea número ' . $numeroTarea . ' en tu lista de pendientes.';
+                }
+            } else {
+                $textoResp = 'Entendí la acción, pero necesito que me digas el número de la tarea (ej: "borra la 2").';
+            }
+            $bot->reply($textoResp, $datos_adicionales);
             break;
+        case 'saludar':
+            $textoResp = '¡Hola! ¿Cómo puedo ayudarte?';
+            $bot->reply($textoResp, $datos_adicionales);
+            break;
+        
         default:
-            $bot->reply('Lo siento, no estoy seguro de qué quieres hacer. (Intención: '.$intencion.')');
+            $textoResp = 'Lo siento, no estoy seguro de qué quieres hacer.';
+            $bot->reply($textoResp, $datos_adicionales);
             break;
     }
 });
