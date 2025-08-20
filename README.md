@@ -2,7 +2,7 @@
 
 Un asistente personal conversacional avanzado que combina un sistema de reglas robusto con Inteligencia Artificial. Este proyecto demuestra una arquitectura híbrida donde un cerebro de IA (Python/spaCy) extrae la TAREA, mientras que un motor de reglas "descuartizador" en PHP extrae la FECHA y la HORA.
 
-La característica más destacada es su **ciclo de feedback y re-entrenamiento interactivo**, que permite al usuario mejorar la IA directamente desde la interfaz de chat.
+La característica más destacada es su **ciclo de feedback y re-entrenamiento interactivo**, que permite al usuario mejorar la IA directamente desde la interfaz de chat, transformando cada conversación en una oportunidad de aprendizaje.
 
 - **Cerebro de Tareas (IA - Python/spaCy):** Un modelo de Reconocimiento de Entidades Nombradas (NER) personalizado que extrae la descripción de la tarea (`TAREA`).
 - **Cerebro de Tiempo (Reglas - PHP):** Un motor "descuartizador" que identifica y aísla fragmentos de `FECHA` y `HORA`, junto a un "traductor" que los normaliza para su procesamiento.
@@ -12,9 +12,9 @@ La característica más destacada es su **ciclo de feedback y re-entrenamiento i
 
 - **Interfaz de Chat Inteligente:** Conversación fluida con respuestas contextuales.
 - **Sistema de Triple Botón para Tareas:**
-  - **Sí, guardar:** Confirma la tarea y **refuerza el conocimiento de la IA** guardando el acierto como un ejemplo de entrenamiento.
-  - **No, corregir fecha:** Permite una corrección rápida de la fecha/hora para la tarea actual, sin afectar el entrenamiento.
-  - **No, re-entrenar IA:** Abre un panel avanzado para enseñarle a la IA los fragmentos de texto correctos, mejorando su precisión futura.
+  - **✅ Sí, guardar:** Confirma la tarea y **refuerza el conocimiento de la IA** guardando el acierto como un ejemplo de entrenamiento.
+  - **✏️ No, corregir fecha:** Permite una corrección rápida de la fecha/hora para la tarea actual, sin afectar el entrenamiento.
+  - **🧠 No, re-entrenar IA:** Abre un panel avanzado para enseñarle a la IA los fragmentos de texto correctos, mejorando su precisión futura.
 - **Gimnasio de IA (`entrenamiento.html`):** Herramienta dedicada para crear datos de entrenamiento de alta calidad para el cerebro de entidades (`TAREA`, `FECHA`, `HORA`).
 - **Feedback de Intenciones:** Botones (✓/✗) en las respuestas para mejorar el clasificador de intenciones.
 - **Arquitectura Híbrida Robusta:** Combina la precisión de las reglas para el tiempo con la flexibilidad contextual de la IA para las tareas.
@@ -32,14 +32,14 @@ La característica más destacada es su **ciclo de feedback y re-entrenamiento i
 
 1.  **Clonar el Repositorio:**
     ```bash
-    git clone [URL-DE-TU-REPOSITORIO]
-    cd [NOMBRE-DEL-PROYECTO]
+    git clone https://github.com/scastanoh/asistente-personal-php.git
+    cd asistente-personal-php
     ```
 
 2.  **Configurar la Base de Datos:**
     - Crea una base de datos y un usuario en MySQL.
     - Importa la estructura de las tablas: `tareas`, `feedback_log`, y `ner_training_data`.
-    - Asegúrate de que `ner_training_data` tenga las columnas `fecha_texto` y `hora_texto`.
+    - **Importante:** Asegúrate de que `ner_training_data` tenga las columnas `fecha_texto` y `hora_texto` (VARCHAR).
 
 3.  **Instalar Dependencias de PHP:**
     ```bash
@@ -50,8 +50,8 @@ La característica más destacada es su **ciclo de feedback y re-entrenamiento i
     ```bash
     python3 -m venv venv
     source venv/bin/activate
-    pip install -r requirements.txt 
-    # (Asegúrate de tener un requirements.txt con spacy y mysql-connector-python)
+    # Se recomienda crear un archivo requirements.txt con 'spacy' y 'mysql-connector-python'
+    pip install spacy mysql-connector-python
     python -m spacy download es_core_news_lg
     ```
 
@@ -66,7 +66,7 @@ La característica más destacada es su **ciclo de feedback y re-entrenamiento i
       php entrenar_modelo.php
 
       # Entrenar el extractor de entidades (TAREA)
-      source venv/bin/activate
+      # Asegúrate de estar en el entorno virtual (source venv/bin/activate)
       python train_ner.py
       ```
 
